@@ -1,5 +1,5 @@
 import pygame
-from consts import Colors, Fonts
+from consts import Colors, Fonts, WindowSettings
 from game import Game
 
 def main():
@@ -11,10 +11,10 @@ def main():
       if event.type == pygame.QUIT:
         pygame.quit()
       elif event.type == pygame.MOUSEBUTTONDOWN:
-        if 20 <= event.pos[1] <= 80:
-          if 20 <= event.pos[0] <= 130:
+        if WindowSettings.BUTTON_MIN_Y <= event.pos[1] <= WindowSettings.BUTTON_MAX_Y:
+          if WindowSettings.FIRST_BUTTON_MIN_X <= event.pos[0] <= WindowSettings.FIRST_BUTTON_MAX_X:
             Game.run(1)
-          elif 170 <= event.pos[0] <= 280:
+          elif WindowSettings.SECOND_BUTTON_MIN_X <= event.pos[0] <= WindowSettings.SECOND_BUTTON_MAX_X:
             Game.run(2)
     
     try:
