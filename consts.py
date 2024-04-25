@@ -20,6 +20,12 @@ class Fonts:
 class WindowSettings:
   SCREEN_SIZE = 500
   BOTTOM_PANEL_SIZE = 40
+  FIRST_BUTTON_MIN_X = 20
+  FIRST_BUTTON_MAX_X = 130
+  SECOND_BUTTON_MIN_X = 170
+  SECOND_BUTTON_MAX_X = 280
+  BUTTON_MIN_Y = 20
+  BUTTON_MAX_Y = 80
 
 class Probabilities:
   WALL_SPAWN = 1 / 50
