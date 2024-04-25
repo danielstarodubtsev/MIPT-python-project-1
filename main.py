@@ -22,8 +22,14 @@ def main():
     except:
       break
 
-    pygame.draw.rect(menu_screen, Colors.BLACK, (20, 20, 110, 60), 4)
-    pygame.draw.rect(menu_screen, Colors.BLACK, (170, 20, 110, 60), 4)
+    pygame.draw.rect(menu_screen, Colors.BLACK, 
+                     (WindowSettings.FIRST_BUTTON_MIN_X, WindowSettings.BUTTON_MIN_Y,
+                      WindowSettings.FIRST_BUTTON_MAX_X - WindowSettings.FIRST_BUTTON_MIN_X,
+                      WindowSettings.BUTTON_MAX_Y - WindowSettings.BUTTON_MIN_Y), 4)
+    pygame.draw.rect(menu_screen, Colors.BLACK, 
+                     (WindowSettings.SECOND_BUTTON_MIN_X, WindowSettings.BUTTON_MIN_Y,
+                      WindowSettings.SECOND_BUTTON_MAX_X - WindowSettings.SECOND_BUTTON_MIN_X,
+                      WindowSettings.BUTTON_MAX_Y - WindowSettings.BUTTON_MIN_Y), 4)
     text = Fonts.SMALL_FONT.render("1 Player        2 Player", 1, Colors.RED)
     menu_screen.blit(text, (30, 40))
 
