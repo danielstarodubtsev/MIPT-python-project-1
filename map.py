@@ -18,6 +18,9 @@ class Map:
     return self._map[y][x]
   
   def perform_spawns(self, first_snake: Snake, second_snake: Snake) -> None:
+    # Я не буду объединять это в один метод, т.к. код внутри if-ов принципиально различается и меняет
+    # разные локальные переменные
+
     if chance(Probabilities.FOOD_SPAWN) and self._food_count < MaxSpawn.FOOD:
       while True:
         x, y = random_coords(Map.SIZE - 1)
