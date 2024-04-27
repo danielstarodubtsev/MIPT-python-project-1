@@ -19,14 +19,24 @@ def has_lost(snake_to_check: Snake, other_snake: Snake, map: Map) -> bool:
 def check_snake_head(snake: Snake, map: Map) -> None:
   if map.get_cell(*snake.body[-1]).value() == Cell.HAS_FOOD:
     snake.increase_grow(1)
-    map.get_cell(*snake.body[-1]).set_value(Cell.EMPTY)
   elif map.get_cell(*snake.body[-1]).value() == Cell.HAS_BIG_FOOD:
     snake.increase_grow(Values.BIG_FOOD_VALUE)
-    map.get_cell(*snake.body[-1]).set_value(Cell.EMPTY)
   elif map.get_cell(*snake.body[-1]).value() == Cell.HAS_STOP_FOOD:
     snake.increase_stop(Values.STOP_FOOD_VALUE)
     snake.increase_grow(1)
-    map.get_cell(*snake.body[-1]).set_value(Cell.EMPTY)
+
+  map.get_cell(*snake.body[-1]).set_value(Cell.EMPTY)
+
+def handle_key_event(key: pygame.key, snake1: Snake, snake2: Snake) -> bool:
+    directions1 = {pygame.K_w: Directions.UP, pygame.K_s: Directions.DOWN,
+                   pygame.K_a: Directions.LEFT, pygame.K_d: Directions.RIGHT}
+    directions2 = {pygame.K_UP: Directions.UP, pygame.K_DOWN: Directions.DOWN,
+                   pygame.K_LEFT: Directions.LEFT, pygame.K_RIGHT: Directions.RIGHT}
+
+    if key in directions1:
+        snake1.change_direction(directions1[key])
+    elif key in directions2:
+        snake2.change_direction(directions2[key])
 
 class Game:
   def run(number_of_players: int) -> None:
@@ -48,8 +58,9 @@ class Game:
         player_one_snake = Snake([(-1, -1)], stop_factor=1e9)
       
       x = random.randint(0, Map.SIZE - 1)
-      player_two_snake = Snake([(x, 49), (x, 48), (x, 47), (x, 46), (x, 45)],
-                              Directions.UP)
+      player_two_snake = Snake([(x, Map.SIZE - 1), (x, Map.SIZE - 2), (x, Map.SIZE - 3), 
+                                (x, Map.SIZE - 4), (x, Map.SIZE - 5)],
+                                Directions.UP)
       
       lost_players = []
       map = Map()
@@ -60,37 +71,11 @@ class Game:
             pygame.quit()
 
           elif event.type == pygame.KEYDOWN:
-            if not game_paused:
-              if event.key == pygame.K_w:
-                player_one_snake.change_direction(Directions.UP)
-                break
-              elif event.key == pygame.K_s:
-                player_one_snake.change_direction(Directions.DOWN)
-                break
-              elif event.key == pygame.K_a:
-                player_one_snake.change_direction(Directions.LEFT)
-                break
-              elif event.key == pygame.K_d:
-                player_one_snake.change_direction(Directions.RIGHT)
-                break
-              
-              # код ниже нужен, т.к. стрелочки и WASD управляют змейками разных игроков
-              elif event.key == pygame.K_UP:
-                player_two_snake.change_direction(Directions.UP)
-                break
-              elif event.key == pygame.K_DOWN:
-                player_two_snake.change_direction(Directions.DOWN)
-                break
-              elif event.key == pygame.K_LEFT:
-                player_two_snake.change_direction(Directions.LEFT)
-                break
-              elif event.key == pygame.K_RIGHT:
-                player_two_snake.change_direction(Directions.RIGHT)
-                break
-            
             if event.key == pygame.K_SPACE:
               game_paused = not game_paused
-        
+            elif not game_paused:
+              handle_key_event(event.key, player_one_snake, player_two_snake)
+
         if game_paused:
           continue
 
@@ -101,7 +86,7 @@ class Game:
                                                 player_one_snake.direction()))
         else:
           player_one_snake.reduce_stop()
-        
+
         if not player_two_snake.is_stopped():
           player_two_snake.body.append(move_cell(player_two_snake.body[-1], 
                                                 player_two_snake.direction()))
@@ -113,7 +98,7 @@ class Game:
             player_one_snake.reduce_grow()
           else:
             player_one_snake.pop_tail()
-        
+
         if not player_two_snake.is_stopped():
           if player_two_snake.is_growing():
             player_two_snake.reduce_grow()
@@ -122,7 +107,7 @@ class Game:
 
         if has_lost(player_one_snake, player_two_snake, map):
           lost_players.append(1)
-        
+
         if has_lost(player_two_snake, player_one_snake, map):
           lost_players.append(2)
 
@@ -131,15 +116,16 @@ class Game:
             text = Fonts.LARGE_FONT.render("TOTAL: " + str(len(player_two_snake.body)), 1, Colors.YELLOW)
             sc.blit(text, (100, 220))
             pygame.display.update()
-          
+
           time.sleep(1.5)
           pygame.event.clear()
           break
-        
+
         check_snake_head(player_one_snake, map)
         check_snake_head(player_two_snake, map)
 
-        if not render(sc, player_one_snake, player_two_snake, map, number_of_players, first_wins, second_wins, Map.SIZE):
+        if not render(sc, player_one_snake, player_two_snake, map, number_of_players, 
+                      first_wins, second_wins, Map.SIZE):
           break
 
         if len(lost_players) and not (number_of_players == 1 and 2 not in lost_players):
@@ -147,16 +133,14 @@ class Game:
             text = Fonts.LARGE_FONT.render("TOTAL: " + str(len(player_two_snake.body)), 1, Colors.YELLOW)
             sc.blit(text, (100, 220))
             pygame.display.update()
-          
+
           time.sleep(1.5)
           pygame.event.clear()
           break
-        
+
         pygame.display.update()
         pygame.time.delay(50)
 
-      # Я не буду выделять это в отдельный метод, это глупость, менять локальные переменные будет неудобно,
-      # эти три строчки прекрасно выглядят и тут (тем более там continue)
       if len(lost_players) == 2:
         continue
       elif 1 in lost_players:
